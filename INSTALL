@@ -1,0 +1,39 @@
+
+How to install the xmms output plugin for IRIX
+==============================================
+
+1) Get the source for xmms from http://www.xmms.org and unpack it under a
+suitable directory, e.g. /usr/local/src. Then change to the xmms
+directory, e.g. /usr/local/src/xmms-1.0.1
+
+2) Get the source for the IRIX output plugin from
+http://www.rzg.mpg.de/~mpd/xmms and unpack it. It will create a
+subdirectory "xmms-1.0.1/Output/IRIX" under the current directory with all
+necessary files. It will also replace the files "configure" and "Output/Makefile.in".
+
+3) Run "configure", "make", "make install"
+
+4) Start "xmms" and press "Ctrl-P". Select "Audio I/O Plugins" and
+activate the IRIX plugin. That's all.
+
+
+
+This has been tested with xmms-1.0.1 on an SGI Octane running IRIX 6.5.5m.
+
+
+*********
+Warning about the compiler: 'xmms' seems to have lots of 'gcc'
+specific features.  If you try to compile with the SGI compiler 'cc'
+you will have lots and lots of problems. If you want to save yourself
+some trouble, use the GNU compiler 'gcc' instead. If you succeed
+compiling 'xmms' with 'cc', please submit the changes to the 'xmms'
+developer team at http://www.xmms.org.
+*********
+
+
+
+Please send your comments and bug reports to Manuel Panea <mpd@rzg.mpg.de>.
+http://www.rzg.mpg.de/~mpd/xmms
+
+
+
