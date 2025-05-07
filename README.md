@@ -1,5 +1,7 @@
 # IRIX xmms output plugin
 
+Should work with xmms 1.2.11.
+
 The source is from SGI Freeware CDs. I fixed a couple of warnings and removed some dead code and incomplete features which did nothing. The original installation instructions are in INSTALL.old. Do not follow them.
 
 ## Installation
