@@ -1,6 +1,6 @@
 # IRIX xmms output plugin
 
-Source is from SGI Freeware CDs. I fixed a couple of warnings and removed some dead code and incomplete features which did nothing. The original installation instructions are in INSTALL.old.
+The source is from SGI Freeware CDs. I fixed a couple of warnings and removed some dead code and incomplete features which did nothing. The original installation instructions are in INSTALL.old. Do not follow them.
 
 ## Installation
 
