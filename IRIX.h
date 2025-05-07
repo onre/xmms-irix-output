@@ -18,6 +18,8 @@
 #ifndef IRIX_H
 #define IRIX_H
 
+#define XMMS_IRIX_OUTPUT_VERSION  "0.6.1"
+
 #define IRIX_DEBUG_INIT           0x0001
 #define IRIX_DEBUG_ABOUT          0x0002
 #define IRIX_DEBUG_CONFIGURE      0x0004
@@ -35,6 +37,7 @@
 #define IRIX_DEBUG_OUTPUT_AUDIO   0x4000
 #define IRIX_DEBUG_DUMMY          0x0000
 
+#ifdef DEBUG
 #define IRIX_DEBUG (IRIX_DEBUG_INIT |\
                     IRIX_DEBUG_CONFIGURE |\
                     IRIX_DEBUG_OPEN_AUDIO |\
@@ -44,8 +47,9 @@
                     IRIX_DEBUG_BUFFER_PLAYING |\
                     IRIX_DEBUG_WRITTEN_TIME |\
                     IRIX_DEBUG_DUMMY)
-
+#else
 #define IRIX_DEBUG 0
+#endif
 
 #include <gtk/gtk.h>
 
@@ -55,10 +59,8 @@
 #include <stdio.h>
 #include <dmedia/audio.h>
 
-#include "xmms/plugin.h"
-#include "libxmms/configfile.h"
-
-extern OutputPlugin op;
+#include <xmms/plugin.h>
+#include <xmms/configfile.h>
 
 typedef struct
 {
@@ -81,7 +83,6 @@ extern IrixConfig irix_cfg;
 
 void irix_init(void);
 void irix_about(void);
-void irix_configure(void);
 
 void irix_get_volume(int *l,int *r);
 void irix_set_volume(int l,int r);

@@ -11,13 +11,13 @@
 
 
 #include "IRIX.h"
-#include "config.h"
+
+#include <errno.h>
 #include <pthread.h>
+#include <stdlib.h>
 #include <stropts.h>
 #include <unistd.h>
-#include <errno.h>
 #include <sys/file.h>
-
 
 /*****************************************************************************/
 
@@ -44,32 +44,9 @@ static char         *buffer_read = NULL;
 static char         *buffer_write = NULL;
 static char         *buffer_fillend = NULL;
 static int           buffer_len = 0;
-static struct timespec min_wait;
-
-static gint          time_offset = 0;
-static gint          byte_offset = 0;
 
 static gboolean      paused = FALSE;
 static gboolean      playing = FALSE;
-static gboolean      filling = TRUE;
-static gboolean      aopen = FALSE;
-static gint          flush = -1;
-
-static gint          audiofd = -2;
-//static audio_info_t  adinfo;
-static pthread_t      buffer_thread;
-
-static uint_t        audio_scount = 0;
-
-static struct {
-  gboolean         is_signed;
-  gboolean         is_bigendian;
-  uint_t           sample_rate;
-  uint_t           channels;
-  uint_t           precision;
-  gint             bps;
-  gint             output_precision;
-}                    stream_attrs;
 
 /*****************************************************************************/
 
@@ -92,7 +69,8 @@ irix_get_volume(int *left, int *right)
 
   pv[0].param = AL_GAIN;
   pv[0].value.ptr = gain;
-  pv[0].sizeIn = 8;
+  pv[0].sizeIn = 2;
+  
   if( alGetParams(AL_DEFAULT_OUTPUT, pv, 1) < 0)
   {
     fprintf(stderr, "irix_get_volume: alGetParams failed: %s\n", alGetErrorString(oserror()));
@@ -119,8 +97,7 @@ irix_get_volume(int *left, int *right)
 void
 irix_set_volume(int left, int right)
 {
-  double gainleft, gainright,
-    *min = &irix_cfg.min_volume;
+  double *min = &irix_cfg.min_volume;
   ALpv pv[1];
   ALfixed gain[8];
 
@@ -135,7 +112,8 @@ irix_set_volume(int left, int right)
 
   pv[0].param = AL_GAIN;
   pv[0].value.ptr = gain;
-  pv[0].sizeIn = 8;
+  pv[0].sizeIn = 2;
+  
   if( alSetParams(AL_DEFAULT_OUTPUT, pv, 1) < 0)
   {
     fprintf(stderr, "irix_set_volume: alSetParams failed: %s\n", alGetErrorString(oserror()));
@@ -185,7 +163,7 @@ irix_open_audio(AFormat fmt, gint rate, gint nch)
   {
     fprintf(stderr, "irix_init: alOpenPort failed: %s\n",
             alGetErrorString(oserror()));
-    return;
+    return 0;
   }
   irix_cfg.resource = alGetResource(irix_cfg.port);
   irix_cfg.maxFillable = alGetFillable(irix_cfg.port);
@@ -197,7 +175,7 @@ irix_open_audio(AFormat fmt, gint rate, gint nch)
   if (frameSize == 0 || channelCount == 0)
   {
     fprintf(stderr, "irix_open_audio: bad frameSize or channelCount\n");
-    return;
+    return 0;
   }
   irix_cfg.combinedFrameSize = frameSize * channelCount;
 
@@ -270,7 +248,7 @@ irix_write_audio(void *ptr, gint length)
     memcpy(buffer_read, ptr, length1);
     buffer_fillend = buffer_end;
     buffer_read = buffer_ptr;
-    memcpy(buffer_read, ptr + length1, length2);
+    memcpy(buffer_read, (gchar *) ptr + length1, length2);
     buffer_read += length2;
   }
   else
@@ -366,7 +344,7 @@ irix_flush(gint ftime)
   
   if (IRIX_DEBUG & IRIX_DEBUG_FLUSH)
   {
-    fprintf(stderr, "irix_flush: currentFrameNumber: %d\n", irix_cfg.currentFrameNumber);
+    fprintf(stderr, "irix_flush: currentFrameNumber: %lld\n", irix_cfg.currentFrameNumber);
   }
 
 
@@ -544,7 +522,7 @@ irix_output_time(void)
 
   if (IRIX_DEBUG & IRIX_DEBUG_OUTPUT_TIME)
   {
-    fprintf(stderr, "irix_output_time: currentFN: %d\n",
+    fprintf(stderr, "irix_output_time: currentFN: %lld\n",
             irix_cfg.currentFrameNumber);
   }
 

@@ -6,10 +6,10 @@ static OutputPlugin op =
 {
     NULL,
     NULL,
-    "IRIX audio plugin v0.6",
+    "IRIX audio plugin v"XMMS_IRIX_OUTPUT_VERSION,
     irix_init,
     irix_about,
-    irix_configure,
+    NULL,
     irix_get_volume,
     irix_set_volume,
     irix_open_audio,
